@@ -81,7 +81,7 @@ Q<-lapply(Q,function(x){
  x$deaths[is.na(x$deaths)]<-0
  x[x$teryt!="t0000",]->x
  x[order(x$teryt),]->x
- x[(x$new_cases>0) & (x$deaths>0),]->x
+ x[(x$new_cases>0) | (x$deaths>0),]->x
  x
 })
 
