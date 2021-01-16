@@ -3,7 +3,10 @@ library(xml2)
 
 url0<-'https://www.gov.pl%s'
 
-GET(sprintf(url0,'/web/koronawirus/pliki-archiwalne-powiaty'))->s
+n<-sprintf(url0,'/web/koronawirus/pliki-archiwalne-powiaty')
+message("Downloading index from ",n)
+
+GET(n)->s
 xml_attr(A<-xml_find_all(content(s),'//a[@class="file-download"]'),'href')->W
 
 xml_text(xml_find_all(A,'.//span[@class="extension"]'))->f
@@ -48,7 +51,10 @@ apply(K,1,function(x) na.omit(x)[1])->fp
 
 
 lapply(W,function(w){
- GET(sprintf(url0,w))->z
+ n<-sprintf(url0,w)
+ message("Downloading ",n)
+ Sys.sleep(1)
+ GET(n)->z
  read.csv2(textConnection(content(z,as='text',encoding="cp1250")))
 })->Q
 
@@ -75,8 +81,11 @@ unify<-function(x){
  as.data.frame(ans)
 }
 
-Q<-lapply(Q,function(x){
- x<-unify(x)
+Q<-lapply(Q,function(raw){
+ x<-try(unify(raw))
+ if(inherits(x,"try-error")){
+  return(NULL)
+ }
  x$new_cases[is.na(x$new_cases)]<-0
  x$deaths[is.na(x$deaths)]<-0
  x[x$teryt!="t0000",]->x
@@ -84,6 +93,8 @@ Q<-lapply(Q,function(x){
  x[(x$new_cases>0) | (x$deaths>0),]->x
  x
 })
+
+Q[!sapply(Q,is.null)]->Q
 
 for(x in Q)
  write.table(x,row.names=FALSE,sprintf('covid_govpl_%s.tsv',head(x$date,1)))
