@@ -29,7 +29,18 @@ lapply(list.files(d,patt='csv$',full.names=TRUE),function(fn){
 	x
 })->Q
 
-for(x in Q)
- write.table(x,row.names=FALSE,sprintf('covid_govpl_%s.tsv',head(x$date,1)))
- 
-
+if(!interactive()){
+ #Drop each day in a Y/M/D directory structure
+ for(x in Q){
+  d<-head(x$date,1)
+  f<-sprintf("%s/%s/covid_govpl_%s.tsv",
+          substr(d,1,4),substr(d,5,6),d)
+  dir.create(dirname(f),showWarnings=FALSE,recursive=TRUE)
+  write.table(x,row.names=FALSE,sep='\t',f)
+ }
+  
+ #Drop everything in a single large file
+ do.call(rbind,Q)->Qa
+ Qa[order(Qa$teryt,Qa$date),]->Qa
+ write.table(Qa,row.names=FALSE,sep='\t','covid_govpl.tsv')
+}
