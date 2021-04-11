@@ -30,6 +30,6 @@ lapply(list.files(d,patt='csv$',full.names=TRUE),function(fn){
 })->Q
 
 for(x in Q)
- write.table(x,row.names=FALSE,sprintf('covid_govpl_%s.tsv',head(x$date,1)))
+ write.table(x,row.names=FALSE,sep='\t',sprintf('covid_govpl_%s.tsv',head(x$date,1)))
  
 
