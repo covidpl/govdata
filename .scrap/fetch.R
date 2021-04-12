@@ -8,6 +8,8 @@ if(!file.exists('danehistorycznepowiaty.zip')){
 tempdir()->d
 unzip('danehistorycznepowiaty.zip',exdir=d)
 
+#pseudo-TERYT of a whole country
+t0<-"t0000"
 
 lapply(list.files(d,patt='csv$',full.names=TRUE),function(fn){ 
 	read.csv2(fn)->x
@@ -19,13 +21,21 @@ lapply(list.files(d,patt='csv$',full.names=TRUE),function(fn){
 	x[,c("liczba_przypadkow","zgony","teryt","date")]->x
 	names(x)<-c("new_cases","deaths","teryt","date")
 
- x[x$teryt!="t0000",]->x
  x$new_cases[is.na(x$new_cases)]<-0
  #Deaths number is malformed in some files
  x$deaths<-as.numeric(x$deaths)
  x$deaths[is.na(x$deaths)]<-0
+
+ stopifnot(sum(x$teryt==t0)<=1)
+
+ #Convert whole-country total to a number with unknown location
+ x$deaths[x$teryt==t0]<-x$deaths[x$teryt==t0]-sum(x$deaths[x$teryt!=t0])
+ x$new_cases[x$teryt==t0]<-x$new_cases[x$teryt==t0]-sum(x$new_cases[x$teryt!=t0])
+ x$teryt[x$teryt==t0]<-NA
+
  x[order(x$teryt),]->x
  x[(x$new_cases>0) | (x$deaths>0),]->x
+
 	x
 })->Q
 
