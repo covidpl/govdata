@@ -1,12 +1,11 @@
-if(!file.exists('danehistorycznepowiaty.zip')){
- stop("Unfortunately, automatic download from gov.pl is impossible
- since ArcGIS system is used. Fetch the danehistorycznepowiaty.zip 
- file by yourself and re-reun")
-}
-
-#Unzip
+#Download and unzip
+tempfile()->p
+download.file(
+ 'https://arcgis.com/sharing/rest/content/items/e16df1fa98c2452783ec10b0aea4b341/data',
+ p
+)
 tempdir()->d
-unzip('danehistorycznepowiaty.zip',exdir=d)
+unzip(p,exdir=d)
 
 #pseudo-TERYT of a whole country
 t0<-"t0000"
