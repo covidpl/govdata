@@ -52,4 +52,13 @@ if(!interactive()){
  do.call(rbind,Q)->Qa
  Qa[order(Qa$teryt,Qa$date),]->Qa
  write.table(Qa,row.names=FALSE,sep='\t','covid_govpl.tsv')
+
+ #Drop a per-day summary
+ data.frame(
+  new_cases=tapply(Qa$new_cases,Qa$date,sum),
+  deaths=tapply(Qa$deaths,Qa$date,sum),
+  date=tapply(Qa$date,Qa$date,head,1)
+ )->Qd
+ write.table(Qd,row.names=FALSE,sep='\t','covid_govpl_daily.tsv')
 }
+
