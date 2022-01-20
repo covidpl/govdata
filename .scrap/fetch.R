@@ -48,6 +48,40 @@ import_cd<-function(d){
  }))
 }
 
+import_tst<-function(d){
+ rb(lapply(list.files(d,patt='csv$',full.names=TRUE),function(fn){ 
+  read.csv2(fn)->x
+
+  #Extract date from the file name
+  x$date<-gsub('^.*(\\d{8})\\d{6}.*$','\\1',basename(fn))
+
+  #Discard broken data from the start
+  if(x$date[1]<"20210108") return(NULL)
+
+  x[,c(
+   "liczba_wykonanych_testow",
+   "liczba_testow_z_wynikiem_pozytywnym",
+   "liczba_testow_z_wynikiem_negatywnym",
+   "liczba_pozostalych_testow",
+   "teryt","date")]->x
+  names(x)<-c("tests","positive","negative","other","teryt","date")
+
+  stopifnot(all(!is.na(x$test)))
+
+  stopifnot(sum(x$teryt==t0)<=1)
+
+  #Convert whole-country total to a number with unknown location
+  for(e in c("tests","positive","negative","other"))
+   x[[e]][x$teryt==t0]<-x[[e]][x$teryt==t0]-sum(x[[e]][x$teryt!=t0])
+  x$teryt[x$teryt==t0]<-NA
+
+  x[order(x$teryt),]->x
+  x[(x$tests>0),]->x
+
+  x
+ }))
+}
+
 import_vax<-function(d){
  rb(lapply(list.files(d,patt='pow_szczepienia.csv$',full.names=TRUE),function(fn){ 
   read.csv2(fn)->x
@@ -89,12 +123,22 @@ drop_file<-function(Q,fn){
 
 
 if(!interactive()){
- #Cases download & convert
- import_cd(download_package(case_death_url))->Qa
+ #Cases and tests download
+ download_package(case_death_url)->govpl
+
+ #Cases convert
+ import_cd(govpl)->Qa
 
  #Render
  drop_dirs(Qa,'covid_govpl_')
  drop_file(Qa,'covid_govpl.tsv')
+
+ #Tests download & convert
+ import_tst(govpl)->Qt
+
+ #Render
+ drop_dirs(Qt,'covid_tests_')
+ drop_file(Qt,'covid_tests.tsv')
  
  #Vax download & convert
  import_vax(download_package(vax_url))->Qv

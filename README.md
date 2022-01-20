@@ -10,9 +10,19 @@ Each file has 4 columns:
 3. `teryt`, the [TERYT code](https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/aktualnosci/aktualnosci.aspx) identifying the said powiat, prefixed with `t` character to prevent accidental conversion into a number,
 4. `date`, the said date, in YYYYMMDD format.
 
+The tests part is available in a single tab-separated text file under this link [`https://raw.githubusercontent.com/covidpl/govdata/master/covid_tests.tsv`](https://raw.githubusercontent.com/covidpl/govdata/master/covid_tests.tsv); there is also a file-per-day version in a year/month/day hierarchy.
+
+Each file has 6 columns:
+1. `tests`, the number of tests done at a particular date in a particular powiat,
+2. `positive`, the number of tests with  positive outcome,
+3. `negative`, the number of tests with a negative outcome,
+4. `other`, the number of tests with other (inconclusive?) outcome,
+5. `teryt`, the [TERYT code](https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/aktualnosci/aktualnosci.aspx) identifying the said powiat, prefixed with `t` character to prevent accidental conversion into a number,
+6. `date`, the said date, in YYYYMMDD format.
+
 The vaccination part is available in a single tab-separated text file under this link [`https://raw.githubusercontent.com/covidpl/govdata/master/covid_vax.tsv`](https://raw.githubusercontent.com/covidpl/govdata/master/covid_vax.tsv); there is also a file-per-day version in a year/month/day hierarchy.
 
-Each file has 4 columns:
+Each file has 5 columns:
 1. `vax_first`, the number of first doses administered at a particular date in a particular powiat,
 2. `vax_full`, the number of second doses administered at a particular date in a particular powiat,
 3. `vax_booster`, the number of booster doses administered at a particular date in a particular powiat,
@@ -22,12 +32,13 @@ Each file has 4 columns:
 Some records are not localised, and they are assigned to a `NA` value in the `teryt` column.
 Records with all counts equal zero are omitted.
 
-The registry is manually updated on a semi-regular basis, using [the R script provided with the data](https://github.com/covidpl/govdata/blob/master/.scrap/fetch.R).
+The registry is updated on a semi-regular basis, using [the R script provided with the data](https://github.com/covidpl/govdata/blob/master/.scrap/fetch.R).
 
 ## Notes
 - The data is unreliable, especially the new cases records, due to varying testing strategy. Weekends and holidays cause reporting delays and testing downtimes, which contribute to an evident weekly cycle and some spurious dents. Low-pass filtering is advised for somewhat more accurate picture.
 - The data starts in a strange moment (24 XI 2020), which corresponds to a substantial change in reporting policy. For earlier data, you can find [this citizen-science project lead by Mr. Michał Rogalski](http://bit.ly/covid19-poland) useful.
-- Vaccination data starts at 13 I 2021; doses administered before are not counted (this is a rather small number).
+- Vaccination data starts on 13 I 2021; doses administered before are not counted (this is a rather small number).
+- Testing data starts on 8 I 2021 (earlier data seems broken).
 - There are more fields in the source data, which you somehow might found useful.
 - Provided AS IS, without any guarantees. USE AT YOUR OWN RISK.
 
