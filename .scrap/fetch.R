@@ -26,6 +26,10 @@ import_cd<-function(d){
   x$date<-gsub('^.*(\\d{8})\\d{6}.*$','\\1',basename(fn))
 
   #Extract useful and consistently reported data only
+  
+  nck<-"liczba_wszystkich_zakazen"
+  if(nck%in%names(x)) x$liczba_przypadkow<-x[[nck]]
+
   x[,c("liczba_przypadkow","zgony","teryt","date")]->x
   names(x)<-c("new_cases","deaths","teryt","date")
 
