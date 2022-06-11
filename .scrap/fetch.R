@@ -97,6 +97,7 @@ import_cd<-function(d){
 
   x
  }))->daily
+
  rbind(full,daily)
 }
 
@@ -131,7 +132,43 @@ import_tst<-function(d){
   x[(x$tests>0),]->x
 
   x
- }))
+ }))->full
+
+ list.files(scrap_daily,patt='govpl_powdaily.*.RDS',full=TRUE,recursive=TRUE)->K
+ #Remove dailies already in a bunch file
+ gsub('^.*(\\d{8}).RDS$','\\1',basename(K))->dates
+ K[!(dates%in%full$date)]->K
+
+ #Load & convert
+ rb(lapply(K,function(fn){
+  gsub('^.*(\\d{8}).RDS$','\\1',basename(fn))->date
+  readRDS(fn)->x
+  x$date<-date
+
+  x[,c(
+   "liczba_wykonanych_testow",
+   "liczba_testow_z_wynikiem_pozytywnym",
+   "liczba_testow_z_wynikiem_negatywnym",
+   "liczba_pozostalych_testow",
+   "teryt","date")]->x
+  names(x)<-c("tests","positive","negative","other","teryt","date")
+
+  stopifnot(all(!is.na(x$test)))
+
+  stopifnot(sum(x$teryt==t0)<=1)
+
+  #Convert whole-country total to a number with unknown location
+  for(e in c("tests","positive","negative","other"))
+   x[[e]][x$teryt==t0]<-x[[e]][x$teryt==t0]-sum(x[[e]][x$teryt!=t0])
+  x$teryt[x$teryt==t0]<-NA
+
+  x[order(x$teryt),]->x
+  x[x$tests>0,]->x
+
+  x
+ }))->daily
+
+ rbind(full,daily)
 }
 
 import_vax<-function(d){
