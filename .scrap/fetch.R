@@ -21,7 +21,7 @@ download_package<-function(url){
 
 download_daily<-function(){
  key<-"stan_rekordu_na"
- read.csv2(daily_url,fileEncoding='cp1250')->x
+ read.csv2(daily_url)->x
  stopifnot(key%in%names(x))
  unique(x[[key]])->d
  stopifnot(length(d)==1)
